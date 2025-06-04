@@ -1,4 +1,6 @@
 # General imports
+import tempfile
+
 import pytest
 from selenium import webdriver
 
@@ -19,24 +21,48 @@ def pytest_addoption(parser):
         "--browser", action="store", default="chrome", help="Send 'chrome' or 'firefox' as parameter for execution"
     )
 
-
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def driver(request):
+    """
+    Launch a headless Chrome on GitHub Actions (Ubuntu). We force Chrome to use
+    a brand-new, empty user-data directory (in /tmp) on each session so that
+    “user data directory already in use” errors never occur.
+    """
     browser = request.config.getoption("--browser")
-    # Default driver value
-    driver = ""
-    # Option setup to run in headless mode (in order to run this in GH Actions)
-    options = Options()
-    options.add_argument('--headless')
-    # Setup
-    print(f"\nSetting up: {browser} driver")
+    drv = ""
+    # 1) Build ChromeOptions
+    opts = Options()
+
+    # Use the new headless mode; on GH runners this avoids some legacy issues.
+    opts.add_argument("--headless=new")
+    opts.add_argument("--no-sandbox")
+    opts.add_argument("--disable-gpu")
+    opts.add_argument("--disable-dev-shm-usage")
+    opts.add_argument("--disable-extensions")
+
+    # 2) Create a fresh, empty directory for Chrome's user-data
+    tmp_dir = tempfile.mkdtemp(prefix="chrome-user-data-")
+    opts.add_argument(f"--user-data-dir={tmp_dir}")
+
+    # 3) Install the matching chromedriver, then start Chrome
     if browser == "chrome":
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        drv = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=opts)
     elif browser == "firefox":
-        driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+        drv = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+
     # Implicit wait setup for our framework
-    driver.implicitly_wait(10)
-    yield driver
-    # Tear down
-    print(f"\nTear down: {browser} driver")
-    driver.quit()
+    drv.implicitly_wait(10)
+    yield drv
+
+    # 4) Teardown: quit Chrome and remove the temp folder
+    try:
+        drv.quit()
+    except Exception:
+        pass
+    # Clean up the temp profile directory
+    try:
+        # shutil.rmtree would remove it recursively
+        import shutil
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+    except Exception:
+        pass
