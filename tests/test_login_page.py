@@ -9,7 +9,7 @@ BASE_URL      = os.getenv("URL")
 
 class TestLoginPage:
     def test_valid_login(self, driver):
-        driver.get(BASE_URL)
+        driver.get(os.getenv("URL"))
         # time.sleep(2)
 
         # # Type username

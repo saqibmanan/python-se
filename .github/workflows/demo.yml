@@ -2,7 +2,7 @@ name: selenium_tutorial
 on: [push]
 
 env:
-  BASE_URL: ${{ secrets.BASE_URL }}
+  URL: ${{ secrets.BASE_URL }}
 
 jobs:
   build:
