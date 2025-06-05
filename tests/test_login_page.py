@@ -1,11 +1,15 @@
 import time
 import pytest
 from selenium.webdriver.common.by import By
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+BASE_URL      = os.getenv("URL")
 
 class TestLoginPage:
     def test_valid_login(self, driver):
-        driver.get("https://civicdataspace.in/")
+        driver.get(BASE_URL)
         # time.sleep(2)
 
         # # Type username
