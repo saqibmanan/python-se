@@ -3,7 +3,7 @@ on: [push]
 
 env:
   URL: ${{ secrets.BASE_URL }}
-#  URL_ALL_DATA: ${{secrets.}}
+  URL_ALL_DATA: ${{secrets.ALL_DATA_URL}}
 
 jobs:
   build:
