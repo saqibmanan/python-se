@@ -13,6 +13,7 @@ class TestLoginPage:
         driver.get(BASE_URL)
         time.sleep(5)
         driver.get(ALL_DATA_URL)
+        time.sleep(5)
         # # Type username
         # username_input = driver.find_element(By.ID, "user-name")
         # username_input.send_keys("standard_user")
