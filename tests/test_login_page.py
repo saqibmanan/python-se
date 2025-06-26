@@ -6,11 +6,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 BASE_URL      = os.getenv("URL")
+ALL_DATA_URL = os.getenv("URL_ALL_DATA")
 
 class TestLoginPage:
     def test_valid_login(self, driver):
-        driver.get(os.getenv("URL"))
+        driver.get(BASE_URL)
         # time.sleep(2)
+        # print("test all data URL")
+        # driver.get(os.getenv("ALL_DATA_URL"))
 
         # # Type username
         # username_input = driver.find_element(By.ID, "user-name")
