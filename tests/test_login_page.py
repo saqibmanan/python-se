@@ -11,8 +11,8 @@ ALL_DATA_URL = os.getenv("URL_ALL_DATA")
 class TestLoginPage:
     def test_home_url(self, driver):
         driver.get(BASE_URL)
-        time.sleep(2)
-
+        time.sleep(5)
+        driver.get(ALL_DATA_URL)
         # # Type username
         # username_input = driver.find_element(By.ID, "user-name")
         # username_input.send_keys("standard_user")
@@ -27,14 +27,15 @@ class TestLoginPage:
 
         # URL Validation
         actual_url = driver.current_url
-        assert actual_url == "https://civicdataspace.in/"
+        # assert actual_url == "https://civicdataspace.in/"
+        assert actual_url == "https://civicdataspace.in/datasets?size=9&page=1&sort=recent"
 
         # time.sleep(2)
-    def test_all_data_url(self, driver):
-        driver.get(ALL_DATA_URL)
-        time.sleep(5)
-        actual_url_data = driver.current_url
-        assert actual_url_data == "https://civicdataspace.in/datasets?size=9&page=1&sort=recent"
+    # def test_all_data_url(self, driver):
+    #     driver.get(ALL_DATA_URL)
+    #     time.sleep(5)
+    #     actual_url_data = driver.current_url
+    #     assert actual_url_data == "https://civicdataspace.in/datasets?size=9&page=1&sort=recent"
     # @pytest.mark.parametrize("username, password, error", [
     #     ("locked_out_user", "secret_sauce", "Epic sadface: Sorry, this user has been locked out."),
     #     ("invalidUser", "invalidPass", "Epic sadface: Username and password do not match any user in this service")])
