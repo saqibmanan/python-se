@@ -58,30 +58,44 @@ class HomePage(BasePage):
         except TimeoutException:
             return False
 
+    from selenium.common.exceptions import ElementClickInterceptedException
+    import json
 
-    def go_to_all_data_page(self) -> DatasetPage:
-        """Navigate to the Datasets tab, falling back to direct navigation."""
+    def go_to_all_data_page(self):
+        # … all your waits/scrolling/maximize as before …
 
-        # Dismiss the cookie consent banner if it appears.  We keep the wait
-        # short so a missing banner doesn't delay page navigation.
+        elem = self.driver.find_element(By.XPATH, HomepageLocators.TAB_DATASETS)
         try:
-            bann = WebDriverWait(self.driver, 3).until(
-                EC.element_to_be_clickable((By.ID, "cookieConsentAccept"))
-            )
-            bann.click()
-        except TimeoutException:
-            pass
+            elem.click()
+        except ElementClickInterceptedException as e:
+            # 1) Log the exception message
+            print("⚠️ Click intercepted:", e.msg)
 
-        try:
-            btn = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, HomepageLocators.TAB_DATASETS))
-            )
-            btn.click()
-        except TimeoutException:
-            # If the datasets tab is not clickable (e.g. due to dynamic layout),
-            # navigate directly to the datasets URL instead.
-            target = os.getenv("URL_ALL_DATA") or f"{self.url.rstrip('/')}/datasets"
-            self.driver.get(target)
+            # 2) Dump a screenshot so you can visually inspect
+            path = "debug_blocker.png"
+            self.driver.save_screenshot(path)
+            print(f"📸 Saved screenshot to {path}")
 
-        # Return a DatasetPage instance for further interactions
+            # 3) Dump page source to a file
+            html = self.driver.page_source
+            with open("debug_blocker.html", "w", encoding="utf-8") as f:
+                f.write(html)
+            print("📄 Written page source snapshot to debug_blocker.html")
+
+            # 4) Find exactly which element is on top at the click point
+            box = elem.location
+            size = elem.size
+            center_x = box["x"] + size["width"] / 2
+            center_y = box["y"] + size["height"] / 2
+            blocker = self.driver.execute_script(
+                "return document.elementFromPoint(arguments[0], arguments[1]).outerHTML;",
+                center_x,
+                center_y
+            )
+            print("🚧 Blocking element HTML:", blocker)
+
+            # re-raise so your test still fails if you want—but now with diagnostics
+            raise
+
         return DatasetPage(self.driver)
+
