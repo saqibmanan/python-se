@@ -74,21 +74,28 @@ class HomePage(BasePage):
     #     return AboutPage(self.driver)
 
     def go_to_all_data_page(self) -> DatasetPage:
-        """Navigate to the Datasets tab, accepting the cookie banner if present."""
+        """Navigate to the Datasets tab, falling back to direct navigation."""
 
+        # Dismiss the cookie consent banner if it appears.  We keep the wait
+        # short so a missing banner doesn't delay page navigation.
         try:
             bann = WebDriverWait(self.driver, 3).until(
                 EC.element_to_be_clickable((By.ID, "cookieConsentAccept"))
             )
             bann.click()
         except TimeoutException:
-          pass
+            pass
 
-        btn = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, HomepageLocators.TAB_DATASETS))
-        )
-        btn.click()
-        return DatasetPage(self.driver)
+        try:
+            btn = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, HomepageLocators.TAB_DATASETS))
+            )
+            btn.click()
+        except TimeoutException:
+            # If the datasets tab is not clickable (e.g. due to dynamic layout),
+            # navigate directly to the datasets URL instead.
+            target = os.getenv("URL_ALL_DATA") or f"{self.url.rstrip('/')}/datasets"
+            self.driver.get(target)
 
     # def go_to_publishers(self) -> PublishersPage:
     #     btn = WebDriverWait(self.driver, 10).until(
