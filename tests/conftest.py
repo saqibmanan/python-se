@@ -1,6 +1,8 @@
 # General imports
 import tempfile
-
+import os
+from dotenv import load_dotenv
+load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
 import pytest
 from selenium import webdriver
 
@@ -66,3 +68,14 @@ def driver(request):
         shutil.rmtree(tmp_dir, ignore_errors=True)
     except Exception:
         pass
+
+@pytest.fixture(scope="session")
+def base_url():
+    """
+    This fixture should return the URL that your HomePage.load() does:
+       driver.get(base_url)
+    """
+    url = os.getenv("URL")  # ← local .env probably sets this
+    if not url:
+        pytest.skip("BASE_URL is not set")
+    return url
