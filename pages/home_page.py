@@ -74,14 +74,17 @@ class HomePage(BasePage):
     #     return AboutPage(self.driver)
 
     def go_to_all_data_page(self) -> DatasetPage:
+        """Navigate to the Datasets tab, accepting the cookie banner if present."""
 
-        # try:
-        #     bann = WebDriverWait(self.driver, 3).until(
-        #         EC.element_to_be_clickable((By.ID, "cookieConsentAccept"))
-        #     )
-        #     bann.click()
-        # except:
-        #     pass
+        # Dismiss the cookie consent banner when it appears. If the banner is
+        # not found within a short time we simply continue.
+        try:
+            bann = WebDriverWait(self.driver, 3).until(
+                EC.element_to_be_clickable((By.ID, "cookieConsentAccept"))
+            )
+            bann.click()
+        except TimeoutException:
+            pass
 
         btn = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, HomepageLocators.TAB_DATASETS))
