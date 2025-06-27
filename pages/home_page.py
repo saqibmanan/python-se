@@ -75,13 +75,13 @@ class HomePage(BasePage):
 
     def go_to_all_data_page(self) -> DatasetPage:
 
-        # try:
-        #     bann = WebDriverWait(self.driver, 3).until(
-        #         EC.element_to_be_clickable((By.ID, "cookieConsentAccept"))
-        #     )
-        #     bann.click()
-        # except:
-        #     pass
+        try:
+            bann = WebDriverWait(self.driver, 3).until(
+                EC.element_to_be_clickable((By.ID, "cookieConsentAccept"))
+            )
+            bann.click()
+        except:
+            pass
 
         btn = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, HomepageLocators.TAB_DATASETS))
