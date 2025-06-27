@@ -3,7 +3,8 @@
 import os
 from dotenv import load_dotenv
 from typing import Union
-
+from selenium.common.exceptions import ElementClickInterceptedException
+import json
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
